@@ -1,7 +1,7 @@
 /**
  * 站在各种巨人的肩膀上~~
  * Rightli.js
- * https://github.com/Rightli/sixth-apples
+ * https://github.com/Rightli/RightliJS_child
  * ----------------------------------------------
  */
 
@@ -518,7 +518,6 @@ Rightli.plugins.Carousel = function (selector, params) {
     }
     var velocityPrevPosition, velocityPrevTime;
     function onTouchMove(event) {
-        // If slider is not touched - exit
         if (!_this.isTouched || params.onlyExternal) return;
         if (isTouchEvent && event.type === 'mousemove') return;
 
@@ -566,7 +565,6 @@ Rightli.plugins.Carousel = function (selector, params) {
         _this.isMoved = false;
         direction = diff < 0 ? 'toNext' : 'toPrev';
 
-        //Short Touches
         if (direction === 'toNext' && (timeDiff <= 300)) {
             if (diffAbs < 30 || !params.shortSwipes) _this.swipeReset();
             else _this.swipeNext(true);
@@ -707,7 +705,6 @@ Rightli.plugins.Carousel = function (selector, params) {
             _this.setWrapperTransition(speed);
         }
         else {
-            //Try the DOM animation
             var currentPosition = _this.getWrapperTranslate();
             var animationStep = Math.ceil((newPosition - currentPosition) / speed * (1000 / 60));
             var direction = currentPosition > newPosition ? 'toNext' : 'toPrev';
@@ -832,7 +829,7 @@ Rightli.plugins.Carousel = function (selector, params) {
     };
 
    
-    function makeSwiper() {
+    function start() {
         _this.calcSlides();
         if (params.loop) {
             _this.createLoop();
@@ -851,7 +848,7 @@ Rightli.plugins.Carousel = function (selector, params) {
        
     }
 
-    makeSwiper();
+    start();
 };
 
 Rightli.plugins.Carousel.prototype = {
@@ -860,7 +857,6 @@ Rightli.plugins.Carousel.prototype = {
         var el = this.wrapper,
             matrix, curTransform, curStyle, transformMatrix;
 
-        // automatic axis detection
         if (typeof axis === 'undefined') {
             axis = this.params.mode === 'horizontal' ? 'x' : 'y';
         }
@@ -868,8 +864,7 @@ Rightli.plugins.Carousel.prototype = {
         if ($.support.transforms && this.params.useCSS3Transforms) {
             curStyle = window.getComputedStyle(el, null);
             if (window.WebKitCSSMatrix) {
-                // Some old versions of Webkit choke when 'none' is passed; pass
-                // empty string instead in this case
+
                 transformMatrix = new WebKitCSSMatrix(curStyle.webkitTransform === 'none' ? '' : curStyle.webkitTransform);
             }
             else {
@@ -878,24 +873,18 @@ Rightli.plugins.Carousel.prototype = {
             }
 
             if (axis === 'x') {
-                //Latest Chrome and webkits Fix
                 if (window.WebKitCSSMatrix)
                     curTransform = transformMatrix.m41;
-                //Crazy IE10 Matrix
                 else if (matrix.length === 16)
                     curTransform = parseFloat(matrix[12]);
-                //Normal Browsers
                 else
                     curTransform = parseFloat(matrix[4]);
             }
             if (axis === 'y') {
-                //Latest Chrome and webkits Fix
                 if (window.WebKitCSSMatrix)
                     curTransform = transformMatrix.m42;
-                //Crazy IE10 Matrix
                 else if (matrix.length === 16)
                     curTransform = parseFloat(matrix[13]);
-                //Normal Browsers
                 else
                     curTransform = parseFloat(matrix[5]);
             }
@@ -913,14 +902,12 @@ Rightli.plugins.Carousel.prototype = {
             coords = {x: 0, y: 0, z: 0},
             translate;
 
-        // passed all coordinates
         if (arguments.length === 3) {
             coords.x = x;
             coords.y = y;
             coords.z = z;
         }
 
-        // passed one coordinate and optional axis
         else {
             if (typeof y === 'undefined') {
                 y = this.params.mode === 'horizontal' ? 'x' : 'y';
@@ -936,16 +923,13 @@ Rightli.plugins.Carousel.prototype = {
             es.left = coords.x + 'px';
             es.top  = coords.y + 'px';
         }
-        //this.callPlugins('onSetWrapperTransform', coords);
-        if (this.params.onSetWrapperTransform) this.fireCallback(this.params.onSetWrapperTransform, this, coords);
+        
     },
 
     setWrapperTransition : function (duration) {
         'use strict';
         var es = this.wrapper.style;
         es.webkitTransitionDuration = es.MsTransitionDuration = es.msTransitionDuration = es.MozTransitionDuration = es.OTransitionDuration = es.transitionDuration = (duration / 1000) + 's';
-        //this.callPlugins('onSetWrapperTransition', {duration: duration});
-        if (this.params.onSetWrapperTransition) this.fireCallback(this.params.onSetWrapperTransition, this, duration);
 
     },
     setTransform : function (el, transform) {
